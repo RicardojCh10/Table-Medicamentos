@@ -6,17 +6,20 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 
 import Navbar from './components/navbar';
+import MedicationTable from './pages/MedicationTable';
 
 function App() {
   return (
     <div className="App">
       <>
         <Router>
-          
+          <header>
+            <Navbar />
+          </header>
 
           <div>
             <Routes>
-              <Route path="/" element={<Navbar />} />
+              <Route path="/medicationTable" element={<MedicationTable />} />
             </Routes>
           </div>
 
