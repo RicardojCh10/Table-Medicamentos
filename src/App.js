@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import "./MedicationTable.css"; // Importa el archivo de estilos CSS
+import "./App.css"; // Importa el archivo de estilos CSS
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
@@ -20,7 +20,7 @@ function App() {
 
           <div>
             <Routes>
-              <Route path="/medicationTable" element={<MedicationTable />} />
+              <Route path="/medicationTable" element={<MedicationTable/>} />
               <Route path="/login" element={<LoginPage />} />
             </Routes>
           </div>

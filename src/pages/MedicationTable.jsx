@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock } from "@fortawesome/free-regular-svg-icons";
-import "../MedicationTable.css";
+import { faClock, faSun, faCloudSun, faCloudMoon, faMoon, faQuestion } from "@fortawesome/free-solid-svg-icons";
+import "../App.css";
 
-// ... (el resto de tu código)
-
-
+import "../App.css";
 
 const MedicationTable = () => {
   const [medications, setMedications] = useState(createInitialMedications());
@@ -40,19 +38,60 @@ const MedicationTable = () => {
 
   const addMedication = () => {
     const newMedications = [...medications];
-    const emptyRow = newMedications.find(
-      (med) => med.time === formData.selectedTime && !med.medicationName
+    const existingRow = newMedications.find(
+      (med) => med.time === formData.selectedTime && med.id === 1
     );
 
-    if (emptyRow) {
-      emptyRow.medicationName = formData.medicationName;
-      emptyRow.dosage = formData.dosage;
-      emptyRow.duration = formData.duration;
-      const { startDate, endDate } = calculateDuration();
-      emptyRow.startDate = startDate;
-      emptyRow.endDate = endDate;
-      emptyRow.comments = formData.comments;
-      emptyRow.startTime = new Date().getTime(); // Agregar el tiempo de inicio
+    if (existingRow) {
+      if (!existingRow.medicationName) {
+        // Si la fila principal está vacía, llenarla
+        existingRow.medicationName = formData.medicationName;
+        existingRow.dosage = formData.dosage;
+        existingRow.duration = formData.duration;
+        const { startDate, endDate } = calculateDuration();
+        existingRow.startDate = startDate;
+        existingRow.endDate = endDate;
+        existingRow.comments = formData.comments;
+        existingRow.startTime = new Date().getTime();
+      } else {
+        // Crear una nueva fila debajo de la fila principal
+        const newRow = {
+          id: newMedications.length + 1,
+          time: formData.selectedTime,
+          medicationName: formData.medicationName,
+          dosage: formData.dosage,
+          duration: formData.duration,
+          comments: formData.comments,
+          startDate: new Date(),
+          endDate: calculateDuration().endDate,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          startTime: new Date().getTime(),
+        };
+        newMedications.splice(
+          newMedications.indexOf(existingRow) + 1,
+          0,
+          newRow
+        );
+      }
+    } else {
+      // Si no existe una fila principal, crear una nueva fila en el mismo horario
+      const newRow = {
+        id: newMedications.length + 1,
+        time: formData.selectedTime,
+        medicationName: formData.medicationName,
+        dosage: formData.dosage,
+        duration: formData.duration,
+        comments: formData.comments,
+        startDate: new Date(),
+        endDate: calculateDuration().endDate,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        startTime: new Date().getTime(),
+      };
+      newMedications.push(newRow);
     }
 
     setMedications(newMedications);
@@ -89,18 +128,52 @@ const MedicationTable = () => {
   const getRowClass = (time) => {
     switch (time) {
       case "Morning":
-        return "morning-row";
+        return (
+          <span>
+            <FontAwesomeIcon icon={faSun} /> Morning
+          </span>
+        );
       case "Noon":
-        return "noon-row";
+        return (
+          <span>
+            <FontAwesomeIcon icon={faCloudSun} /> Noon
+          </span>
+        );
       case "Evening":
-        return "evening-row";
+        return (
+          <span>
+            <FontAwesomeIcon icon={faCloudMoon} /> Evening
+          </span>
+        );
       case "Night":
-        return "night-row";
+        return (
+          <span>
+            <FontAwesomeIcon icon={faMoon} /> Night
+          </span>
+        );
       case "Only when I need it":
-        return "custom-row";
+        return (
+          <span>
+            <FontAwesomeIcon icon={faQuestion} /> Only when I need it
+          </span>
+        );
       default:
         return "";
     }
+  };
+  
+
+  // Agregar el estado para mostrar/ocultar el modal
+  const [showModal, setShowModal] = useState(false);
+
+  // Función para abrir el modal
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -108,74 +181,111 @@ const MedicationTable = () => {
       <div className="row mt-3">
         <div className="col">
           <h3>Agregar Medicamento</h3>
-          <div className="form-group">
-            <label>Horario</label>
-            <select
-              className="form-control"
-              value={formData.selectedTime}
-              onChange={(e) => handleFormChange("selectedTime", e.target.value)}
-            >
-              <option value="Morning">Morning</option>
-              <option value="Noon">Noon</option>
-              <option value="Evening">Evening</option>
-              <option value="Night">Night</option>
-              <option value="Only when I need it">Only when I need it</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Medicamento</label>
-            <select
-              className="form-control"
-              value={formData.medicationName}
-              onChange={(e) =>
-                handleFormChange("medicationName", e.target.value)
-              }
-            >
-              <option value="">Seleccione un medicamento</option>
-              {medicationOptions.map((option, index) => (
-                <option key={index} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Dosis</label>
-            <input
-              type="text"
-              className="form-control"
-              value={formData.dosage}
-              onChange={(e) => handleFormChange("dosage", e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Duración</label>
-            <input
-              type="number"
-              className="form-control"
-              min="1"
-              value={formData.duration}
-              onChange={(e) => handleFormChange("duration", e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Comentarios</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Comentarios"
-              value={formData.comments}
-              onChange={(e) => handleFormChange("comments", e.target.value)}
-            />
-          </div>
-          <button className="btn btn-primary" onClick={addMedication}>
+          <button className="btn btn-primary" onClick={openModal}>
             Agregar
           </button>
+
+          {/* Modal */}
+          <div
+            className={`modal ${showModal ? "show" : ""}`}
+            style={{ display: showModal ? "block" : "none" }}
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Agregar Medicamento</h5>
+                  <button type="button" className="close" onClick={closeModal}>
+                    <span>&times;</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  {/* Contenido del formulario del modal */}
+                  <div className="form-group">
+                    <label>Horario</label>
+                    <select
+                      className="form-control"
+                      value={formData.selectedTime}
+                      onChange={(e) =>
+                        handleFormChange("selectedTime", e.target.value)
+                      }
+                    >
+                      <option value="Morning">Morning</option>
+                      <option value="Noon">Noon</option>
+                      <option value="Evening">Evening</option>
+                      <option value="Night">Night</option>
+                      <option value="Only when I need it">
+                        Only when I need it
+                      </option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Medicamento</label>
+                    <select
+                      className="form-control"
+                      value={formData.medicationName}
+                      onChange={(e) =>
+                        handleFormChange("medicationName", e.target.value)
+                      }
+                    >
+                      <option value="">Seleccione un medicamento</option>
+                      {medicationOptions.map((option, index) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Dosis</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={formData.dosage}
+                      onChange={(e) => handleFormChange("dosage", e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Duración</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      min="1"
+                      value={formData.duration}
+                      onChange={(e) =>
+                        handleFormChange("duration", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Comentarios</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Comentarios"
+                      value={formData.comments}
+                      onChange={(e) =>
+                        handleFormChange("comments", e.target.value)
+                      }
+                    />
+                  </div>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      addMedication();
+                      closeModal(); // Cierra el modal al agregar
+                    }}
+                  >
+                    Agregar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <h2 className="mt-3">Tabla de Medicamentos</h2>
-      <table className="table table-bordered table-striped">
+      <table className="table table-bordered">
         <thead className="thead-dark">
           <tr>
             <th className="grouped-header" rowSpan="4">
@@ -206,21 +316,19 @@ const MedicationTable = () => {
 const createInitialMedications = () => {
   const times = ["Morning", "Noon", "Evening", "Night", "Only when I need it"];
 
-  const initialMedications = times.flatMap((time, index) => {
-    return Array.from({ length: 4 }, (_, i) => ({
-      id: index * 4 + i + 1,
-      time,
-      medicationName: "",
-      dosage: "",
-      startDate: null,
-      endDate: null,
-      comments: "",
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      startTime: null,
-    }));
-  });
+  const initialMedications = times.map((time, index) => ({
+    id: index + 1,
+    time,
+    medicationName: "",
+    dosage: "",
+    startDate: null,
+    endDate: null,
+    comments: "",
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    startTime: null,
+  }));
 
   return initialMedications;
 };
