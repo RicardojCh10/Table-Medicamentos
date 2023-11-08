@@ -117,7 +117,7 @@ const MedicationTable = () => {
         startDate: new Date(),
         endDate: calculateDuration().endDate,
         hours: new Date().getHours(),
-        minutes:  new Date().getMinutes(),
+        minutes: new Date().getMinutes(),
         seconds: new Date().getSeconds(),
         startTime: new Date().getTime(),
       };
@@ -281,22 +281,13 @@ const MedicationTable = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Días de la semana</label>
-                    {["1", "2", "3", "4", "5", "6", "7"].map((day) => (
-                      <div key={day} className="form-check form-check-inline">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id={day}
-                          value={day}
-                          checked={formData.days.includes(day)}
-                          onChange={() => handleFormChange("days", day)}
-                        />
-                        <label className="form-check-label" htmlFor={day}>
-                          {day}
-                        </label>
-                      </div>
-                    ))}
+                    <label>Fecha de inicio</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={formData.startDate}
+                      onChange={(e) => handleFormChange("startDate", e.target.value)}
+                    />
                   </div>
                   <div className="form-group">
                     <label>Comentarios</label>
@@ -333,7 +324,7 @@ const MedicationTable = () => {
             </th>
             <th>Medicamento</th>
             <th>Dosis</th>
-            <th>Días</th>
+            <th>Fecha de inicio</th>
             <th>
               <FontAwesomeIcon icon={faClock} /> Tiempo Transcurrido
             </th>
@@ -365,9 +356,7 @@ const createInitialMedications = () => {
     time,
     medicationName: "",
     dosage: "",
-    days: [],
-    startDate: null,
-    endDate: null,
+    startDate: null, // Modificar para usar fecha de inicio
     comments: "",
     hours: 0,
     minutes: 0,
@@ -397,7 +386,7 @@ const MedicationRow = ({ medication, rowClass, onTakeMedication, takenMedication
       <td>{medication.time}</td>
       <td>{medication.medicationName}</td>
       <td>{medication.dosage}</td>
-      <td>{medication.days.length > 0 ? medication.days.join(", ") : "N/A"}</td>
+      <td>{medication.startDate ? medication.startDate.toLocaleDateString() : "N/A"}</td>
       <td>
         {medication.startTime ? (
           <span>
