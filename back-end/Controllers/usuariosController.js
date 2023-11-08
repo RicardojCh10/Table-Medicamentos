@@ -21,7 +21,12 @@ const obtenerUsuarioId = (req, res) => {
     } else if (results.length === 0) {
       res.status(404).json({ error: "El usuario no fue encontrado" });
     } else {
-      res.json(results[0]);
+      // Verifica si la contraseña es correcta
+      if (results[0].contrasena !== req.body.contrasena) {
+        res.status(401).json({ error: "Correo y/o contraseña incorrectos" });
+      } else {
+        res.json(results[0]);
+      }
     }
   });
 };

@@ -1,7 +1,7 @@
 const connection = require("../database");
 
 const obtenerRecetas = (req, res) => {
-  connection.query('SELECT * FROM Receta', (error, results) => {
+  connection.query('SELECT * FROM receta', (error, results) => {
     if (error) {
       console.error("Error al obtener las recetas", error);
       res.status(500).json({
@@ -15,7 +15,7 @@ const obtenerRecetas = (req, res) => {
 
 const obtenerRecetaPorId = (req, res) => {
   const id = req.params.id_receta;
-  connection.query("SELECT * FROM Receta WHERE id_receta = ?", [id], (error, results) => {
+  connection.query("SELECT * FROM receta WHERE id_receta = ?", [id], (error, results) => {
     if (error) {
       res.status(500).json({ error: "Ocurrió un error al obtener la receta" });
     } else if (results.length === 0) {
@@ -28,29 +28,27 @@ const obtenerRecetaPorId = (req, res) => {
 
 const crearReceta = (req, res) => {
   const {
-    queso,
-    id_materiaPrima_id,
-    tiempo_cuajado,
-    tiempo_maduracion,
-    cantidad_sal,
-    prensado,
-    tiempo_total_elaboracion,
-    valoracion_queso,
-    imagen,
+    id_usuario,
+    medicamento,
+    via_administracion,
+    unidad_medida,
+    cantidad,
+    fecha, // Nueva columna "fecha"
+    dias,
+    intervalo,
   } = req.body;
 
   connection.query(
-    "INSERT INTO Receta (queso, id_materiaPrima_id, tiempo_cuajado, tiempo_maduracion, cantidad_sal, prensado, tiempo_total_elaboracion, valoracion_queso, imagen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO receta (id_usuario, medicamento, via_administracion, unidad_medida, cantidad, fecha, dias, intervalo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
     [
-      queso,
-      id_materiaPrima_id,
-      tiempo_cuajado,
-      tiempo_maduracion,
-      cantidad_sal,
-      prensado,
-      tiempo_total_elaboracion,
-      valoracion_queso,
-      imagen,
+      id_usuario,
+      medicamento,
+      via_administracion,
+      unidad_medida,
+      cantidad,
+      fecha, // Nueva columna "fecha"
+      dias,
+      intervalo,
     ],
     (error, results) => {
       if (error) {
@@ -68,29 +66,27 @@ const crearReceta = (req, res) => {
 const actualizarRecetaPorId = (req, res) => {
   const id = req.params.id_receta;
   const {
-    queso,
-    id_materiaPrima_id,
-    tiempo_cuajado,
-    tiempo_maduracion,
-    cantidad_sal,
-    prensado,
-    tiempo_total_elaboracion,
-    valoracion_queso,
-    imagen,
+    id_usuario,
+    medicamento,
+    via_administracion,
+    unidad_medida,
+    cantidad,
+    fecha, // Nueva columna "fecha"
+    dias,
+    intervalo,
   } = req.body;
 
   connection.query(
-    "UPDATE Receta SET queso = ?, id_materiaPrima_id = ?, tiempo_cuajado = ?, tiempo_maduracion = ?, cantidad_sal = ?, prensado = ?, tiempo_total_elaboracion = ?, valoracion_queso = ?, imagen = ? WHERE id_receta = ?",
+    "UPDATE receta SET id_usuario = ?, medicamento = ?, via_administracion = ?, unidad_medida = ?, cantidad = ?, fecha = ?, dias = ?, intervalo = ? WHERE id_receta = ?",
     [
-      queso,
-      id_materiaPrima_id,
-      tiempo_cuajado,
-      tiempo_maduracion,
-      cantidad_sal,
-      prensado,
-      tiempo_total_elaboracion,
-      valoracion_queso,
-      imagen,
+      id_usuario,
+      medicamento,
+      via_administracion,
+      unidad_medida,
+      cantidad,
+      fecha, // Nueva columna "fecha"
+      dias,
+      intervalo,
       id,
     ],
     (error, results) => {
@@ -106,7 +102,7 @@ const actualizarRecetaPorId = (req, res) => {
 
 const eliminarRecetaPorId = (req, res) => {
   const id = req.params.id_receta;
-  connection.query("DELETE FROM Receta WHERE id_receta = ?", [id], (error, results) => {
+  connection.query("DELETE FROM receta WHERE id_receta = ?", [id], (error, results) => {
     if (error) {
       res.status(500).json({ error: "Ocurrió un error al eliminar la receta" });
     } else {

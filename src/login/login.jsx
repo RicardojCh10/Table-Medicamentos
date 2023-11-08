@@ -1,20 +1,44 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const apiURL = "http://localhost:4001/usuarios"; // URL de la API en desarrollo
 
   const handleLogin = () => {
     if (email && password) {
-      console.log("Usuario autenticado");
+      axios
+        .post(`${apiURL}`, {
+          email: email,
+          password: password,
+        })
+        .then((response) => {
+          console.log("Usuario autenticado");
+          // Aquí puedes manejar la respuesta del servidor, por ejemplo, almacenar un token de autenticación.
+        })
+        .catch((error) => {
+          console.error("Correo y/o contraseña incorrectos");
+        });
     } else {
-      console.error("Correo y/o contraseña incorrectos");
+      console.error("Por favor, ingresa correo y contraseña");
     }
   };
 
   const handleRegistration = () => {
     if (email && password) {
-      console.log("Usuario Registrado");
+      axios
+        .post(`${apiURL}/register`, {
+          email: email,
+          password: password,
+        })
+        .then((response) => {
+          console.log("Usuario Registrado");
+          // Aquí puedes manejar la respuesta del servidor, por ejemplo, mostrar un mensaje de registro exitoso.
+        })
+        .catch((error) => {
+          console.error("Error al registrar usuario");
+        });
     } else {
       console.error("Por favor, ingresa correo y contraseña");
     }
