@@ -1,78 +1,61 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Validation from "./loginValidation";
 import axios from "axios";
+function Login() {
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const apiURL = "http://localhost:4001/usuarios"; // URL de la API en desarrollo
+  const [values, setValues] = useState({
+    email: "",
+    password: ""
+  })
+  
+  const navigate = useNavigate();
+  const [errors, setErrors] = useState({})
 
-  const handleLogin = () => {
-    if (email && password) {
-      axios
-        .post(`${apiURL}`, {
-          email: email,
-          password: password,
-        })
-        .then((response) => {
-          console.log("Usuario autenticado");
-          // Aquí puedes manejar la respuesta del servidor, por ejemplo, almacenar un token de autenticación.
-        })
-        .catch((error) => {
-          console.error("Correo y/o contraseña incorrectos");
-        });
-    } else {
-      console.error("Por favor, ingresa correo y contraseña");
-    }
-  };
+  const handleInput = (event) => {
+    setValues(prev => ({...prev, [event.target.name]: [event.target.value]}))
+  }
 
-  const handleRegistration = () => {
-    if (email && password) {
-      axios
-        .post(`${apiURL}/register`, {
-          email: email,
-          password: password,
-        })
-        .then((response) => {
-          console.log("Usuario Registrado");
-          // Aquí puedes manejar la respuesta del servidor, por ejemplo, mostrar un mensaje de registro exitoso.
-        })
-        .catch((error) => {
-          console.error("Error al registrar usuario");
-        });
-    } else {
-      console.error("Por favor, ingresa correo y contraseña");
-    }
-  };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setErrors(Validation(values));
+    if(errors.email === "" && errors.password === ""){
+      axios.post('http://localhost:8081/login', values)
+      .then(res => {
+        if(res.data === "Success"){
+          navigate('/medicationTable');
+        } else{
+          alert("No existe ningún registro");
+        }
+  })
+      .catch(err  => console.log(err));
+  }
+  }
 
   return (
-    <div className="container text-center mt-5">
-      <h1>Iniciar Sesión</h1>
-      <div className="form-group">
-        <label>Correo Electrónico</label>
-        <input
-          type="email"
-          className="form-control"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+    <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
+      <div className="bg-white p-3 rounded w-25">
+      <h2>Inico de Sesión</h2>
+        <form action="" onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email"> <strong>Email:</strong> </label>
+            <input type="email" placeholder="Ingrese Correo Electrónico" name="email" 
+            onChange={handleInput} className="form-control rounded-0"></input>
+            {errors.email && <span className="text-danger">{errors.email}</span>}
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password"><strong>Contraseña:</strong></label>
+            <input type="password" placeholder="Ingrese la Contraseña" name="password"
+            onChange={handleInput} className="form-control rounded-0"></input>
+              {errors.password && <span className="text-danger">{errors.password}</span>}
+          </div>
+          <button  type='submit' className="btn btn-success w-100 rounded-0">Iniciar Sesión</button>
+          <p>Estas de acuerdo con las politicas y privacidad</p>
+          <Link to ='/signup' className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">Registrarse</Link>
+        </form>
       </div>
-      <div className="form-group">
-        <label>Contraseña</label>
-        <input
-          type="password"
-          className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <button className="btn btn-primary m-2" onClick={handleLogin}>
-        Iniciar Sesión
-      </button>
-      <button className="btn btn-success m-2" onClick={handleRegistration}>
-        Regístrate
-      </button>
     </div>
   );
-};
+}
 
 export default Login;

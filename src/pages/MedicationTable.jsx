@@ -25,6 +25,8 @@ const MedicationTable = () => {
   const [formData, setFormData] = useState({
     medicationName: "",
     dosage: "",
+    frequencyPerDay: 1,
+    hoursBetweenDoses: 8,
     duration: 1,
     comments: "",
     days: [],
@@ -42,82 +44,32 @@ const MedicationTable = () => {
   };
 
   const calculateDuration = () => {
-    const today = new Date();
-    const endDate = new Date(today);
-    endDate.setDate(endDate.getDate() + parseInt(formData.duration));
+    const dosesPerDay = parseInt(formData.frequencyPerDay);
+    const hoursBetweenDoses = parseInt(formData.hoursBetweenDoses);
+    const totalHours = dosesPerDay > 0 ? (formData.duration - 1) * hoursBetweenDoses : 0;
 
-    return { startDate: today, endDate };
+    return totalHours;
   };
 
   const addMedication = () => {
     const newMedications = [...medications];
-    const currentTime = new Date();
-    const timeOptions = ["Morning", "Noon", "Evening", "Night", "Only when I need it"];
+    const dosesPerDay = parseInt(formData.frequencyPerDay);
+    const hoursBetweenDoses = parseInt(formData.hoursBetweenDoses);
+    const intervalBetweenDoses = hoursBetweenDoses * 60 * 60 * 1000; // Convertir horas a milisegundos
 
-    const selectedTime = timeOptions.find((time) => {
-      const hours = currentTime.getHours();
-      if (time === "Morning" && hours >= 6 && hours < 12) {
-        return true;
-      } else if (time === "Noon" && hours >= 12 && hours < 18) {
-        return true;
-      } else if (time === "Evening" && hours >= 18 && hours < 24) {
-        return true;
-      } else if (time === "Night" && hours >= 0 && hours < 6) {
-        return true;
-      }
-      return false;
-    });
-
-    const existingRow = newMedications.find(
-      (med) => med.time === selectedTime && med.id === 1
-    );
-
-    if (existingRow) {
-      if (!existingRow.medicationName) {
-        existingRow.medicationName = formData.medicationName;
-        existingRow.dosage = formData.dosage;
-        existingRow.duration = formData.duration;
-        existingRow.days = formData.days;
-        const { startDate, endDate } = calculateDuration();
-        existingRow.startDate = startDate;
-        existingRow.endDate = endDate;
-        existingRow.comments = formData.comments;
-        existingRow.startTime = new Date().getTime();
-      } else {
-        const newRow = {
-          id: newMedications.length + 1,
-          time: selectedTime,
-          medicationName: formData.medicationName,
-          dosage: formData.dosage,
-          duration: formData.duration,
-          days: formData.days,
-          comments: formData.comments,
-          startDate: new Date(),
-          endDate: calculateDuration().endDate,
-          hours: new Date().getHours(),
-          minutes: new Date().getMinutes(),
-          seconds: new Date().getSeconds(),
-          startTime: new Date().getTime(),
-        };
-        newMedications.splice(
-          newMedications.indexOf(existingRow) + 1,
-          0,
-          newRow
-        );
-      }
-    } else {
+    for (let i = 0; i < dosesPerDay; i++) {
       const newRow = {
         id: newMedications.length + 1,
-        time: selectedTime,
+        time: getMedicationTime(i * hoursBetweenDoses),
         medicationName: formData.medicationName,
         dosage: formData.dosage,
         duration: formData.duration,
         days: formData.days,
         comments: formData.comments,
-        startDate: new Date(),
-        endDate: calculateDuration().endDate,
+        intervalBetweenDoses: intervalBetweenDoses,
+        nextDoseTime: new Date(new Date().getTime() + i * intervalBetweenDoses),
         hours: new Date().getHours(),
-        minutes:  new Date().getMinutes(),
+        minutes: new Date().getMinutes(),
         seconds: new Date().getSeconds(),
         startTime: new Date().getTime(),
       };
@@ -128,6 +80,8 @@ const MedicationTable = () => {
     setFormData({
       medicationName: "",
       dosage: "",
+      frequencyPerDay: 1,
+      hoursBetweenDoses: 8,
       duration: 1,
       comments: "",
       days: [],
@@ -207,6 +161,12 @@ const MedicationTable = () => {
     }
   };
 
+  const getMedicationTime = (hoursOffset) => {
+    const currentTime = new Date();
+    currentTime.setHours(6 + hoursOffset); // Comienza a las 6:00 AM y se incrementa según el offset
+    return currentTime.getHours() >= 18 ? "Night" : "Evening";
+  };
+
   // Agregar el estado para mostrar/ocultar el modal
   const [showModal, setShowModal] = useState(false);
 
@@ -271,32 +231,40 @@ const MedicationTable = () => {
                     />
                   </div>
                   <div className="form-group">
+                    <label>Frecuencia por día</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      min="1"
+                      value={formData.frequencyPerDay}
+                      onChange={(e) =>
+                        handleFormChange("frequencyPerDay", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Horas entre dosis</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      min="1"
+                      value={formData.hoursBetweenDoses}
+                      onChange={(e) =>
+                        handleFormChange("hoursBetweenDoses", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
                     <label>Duración (días)</label>
                     <input
                       type="number"
                       className="form-control"
                       min="1"
                       value={formData.duration}
-                      onChange={(e) => handleFormChange("duration", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("duration", e.target.value)
+                      }
                     />
-                  </div>
-                  <div className="form-group">
-                    <label>Días de la semana</label>
-                    {["1", "2", "3", "4", "5", "6", "7"].map((day) => (
-                      <div key={day} className="form-check form-check-inline">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id={day}
-                          value={day}
-                          checked={formData.days.includes(day)}
-                          onChange={() => handleFormChange("days", day)}
-                        />
-                        <label className="form-check-label" htmlFor={day}>
-                          {day}
-                        </label>
-                      </div>
-                    ))}
                   </div>
                   <div className="form-group">
                     <label>Comentarios</label>
@@ -305,7 +273,9 @@ const MedicationTable = () => {
                       className="form-control"
                       placeholder="Comentarios"
                       value={formData.comments}
-                      onChange={(e) => handleFormChange("comments", e.target.value)}
+                      onChange={(e) =>
+                        handleFormChange("comments", e.target.value)
+                      }
                     />
                   </div>
                   <button
@@ -333,7 +303,7 @@ const MedicationTable = () => {
             </th>
             <th>Medicamento</th>
             <th>Dosis</th>
-            <th>Días</th>
+            <th>Tiempo hasta próxima dosis</th>
             <th>
               <FontAwesomeIcon icon={faClock} /> Tiempo Transcurrido
             </th>
@@ -365,9 +335,7 @@ const createInitialMedications = () => {
     time,
     medicationName: "",
     dosage: "",
-    days: [],
-    startDate: null,
-    endDate: null,
+    startDate: null, // Modificar para usar fecha de inicio
     comments: "",
     hours: 0,
     minutes: 0,
@@ -392,12 +360,25 @@ const MedicationRow = ({ medication, rowClass, onTakeMedication, takenMedication
 
   const isTaken = takenMedications.includes(medication.id);
 
+  const timeUntilNextDose = () => {
+    if (medication.nextDoseTime) {
+      const currentTime = new Date().getTime();
+      const timeDifference = medication.nextDoseTime - currentTime;
+      const hoursUntilNextDose = Math.floor(timeDifference / (60 * 60 * 1000));
+      const minutesUntilNextDose = Math.floor((timeDifference % (60 * 60 * 1000)) / (60 * 1000));
+
+      return `${hoursUntilNextDose}h ${minutesUntilNextDose}m`;
+    } else {
+      return "N/A";
+    }
+  };
+
   return (
     <tr className={rowClass}>
       <td>{medication.time}</td>
       <td>{medication.medicationName}</td>
       <td>{medication.dosage}</td>
-      <td>{medication.days.length > 0 ? medication.days.join(", ") : "N/A"}</td>
+      <td>{timeUntilNextDose()}</td>
       <td>
         {medication.startTime ? (
           <span>

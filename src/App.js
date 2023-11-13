@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, BrowserRouter  } from 'react-router-dom';
 import "./App.css"; // Importa el archivo de estilos CSS
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -7,25 +7,25 @@ import "bootstrap/dist/js/bootstrap.min.js";
 
 import Navbar from './components/navbar';
 import MedicationTable from './pages/MedicationTable';
-import LoginPage from './login/login';
+import Login from './login/login'
+import Signup from './login/signup';
+
 
 function App() {
   return (
     <div className="App">
       <>
-        <Router>
-          <header>
-            <Navbar />
-          </header>
-
+        <BrowserRouter>
           <div>
+            {/* <Navbar/> */}
+
             <Routes>
+              <Route path="/" element={<Login/>} />
+              <Route path="/signup" element={<Signup/>} />
               <Route path="/medicationTable" element={<MedicationTable/>} />
-              <Route path="/login" element={<LoginPage />} />
             </Routes>
           </div>
-
-        </Router>
+        </BrowserRouter>
       </>
 
     </div>
