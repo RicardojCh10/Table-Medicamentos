@@ -125,7 +125,7 @@ function Login() {
               
             </div>
             <div className=' flex justify-center w-full'><h3>¿No has creado una cuenta? </h3>
-              <Link to="/registro">
+              <Link to="/singup">
                 <span className='text-sky-700 mx-2 '>Registrese</span>
               </Link></div>
             </div>
