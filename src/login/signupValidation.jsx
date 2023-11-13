@@ -12,10 +12,10 @@ function Validation(values) {
     }
 
 if(values.email === ""){
-    error.email = "El correo no debe estar vacío";
+    error.email = "El email no debe estar vacío";
 }
 else if(!email_pattern.test(values.email)){
-    error.email = "El correo electrónico no coincide";
+    error.email = "El email electrónico no coincide";
 }else{
     error.email = "";
 }

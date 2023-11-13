@@ -9,6 +9,7 @@ import Navbar from './components/navbar';
 import MedicationTable from './pages/MedicationTable';
 import Login from './login/login'
 import Signup from './login/signup';
+import MedicationChart from './pages/MedicationChart';
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
               <Route path="/" element={<Login/>} />
               <Route path="/signup" element={<Signup/>} />
               <Route path="/medicationTable" element={<MedicationTable/>} />
+              <Route path="/MedicationChart" element={<MedicationChart/>} />
             </Routes>
           </div>
         </BrowserRouter>
