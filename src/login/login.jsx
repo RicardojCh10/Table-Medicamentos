@@ -81,54 +81,21 @@ function Login() {
 
 
   return (
-    !datos.autenticado ? (
-      <form onSubmit={handleLogin} style={{ backgroundImage: 'url("https://m.media-amazon.com/images/I/51F54yNB4DL._AC_SL1000_.jpg")' }}>
-        <h2 className="w-full flex-col text-center text-black  text-4xl p-5">Inicie sesion</h2>
-        <main className="h-fit flex">
-          <div className='bg-white rounded-sm p-2 w-[50%] mx-auto h-[90%] border-x-2 border-b-4 border-t flex items-center flex-wrap py-20'>
-            <div className='flex flex-wrap w-full gap-6'>
-            <div className='flex flex-col items-center justify-center w-full'>
-              <label className='text-md w-[50%] p-1.5'>email:</label>
-              <input
-                className='border-black border rounded-sm px-2 py-[.5%] w-[50%]'
-                type='email'
-                placeholder='ejemplo@gmail.com'
-                name='email'
-                value={datos.email}
-                onChange={(e) => { setDatos({ ...datos, email: e.target.value }) }}
-              />
-            </div>
-            <div className='flex flex-col items-center justify-center w-full'>
-              <label className='text-md w-[50%] p-1.5'>Contraseña:</label>
-              <input
-                className='border-black border rounded-sm px-2 py-[.5%] w-[50%]'
-                type= {showPassword ? "text" : "password"}
-                placeholder='****'
-                name='contrasena'
-                value={datos.contrasena}
-                onChange={(e) => { setDatos({ ...datos, contrasena: e.target.value }) }}
-              />
-              {showPassword ? (
-                <RiEyeOffLine onClick={handleShowPassword} className='absolute mr-[-21.5%] mt-[4%] -translate-y-1/2 hover:cursor-pointer'/>
-
-              ) : (
-                <RiEyeLine onClick={handleShowPassword} className='absolute mr-[-21.5%] mt-[4%] -translate-y-1/2 hover:cursor-pointer'/>
-              )}
-              
-            </div>
-            <div className='text-center justify-center w-full'>
-              <button type='submit' className='bg-black rounded-sm  w-[40%] py-2 transition-all duration-300 ease-in-out hover:bg-sky-700  text-white'>Inicie sesion</button>
-            </div>
-            
-            <div className='text-center justify-center w-full flex flex-wrap '>
-            <div className='w-full '>{error && <span className="text-red-500">{error}</span>}</div>
-              
-            </div>
-            <div className=' flex justify-center w-full'><h3>¿No has creado una cuenta? </h3>
-              <Link to="/registro">
-                <span className='text-sky-700 mx-2 '>Registrese</span>
-              </Link></div>
-            </div>
+    <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
+      <div className="bg-white p-3 rounded w-25">
+      <h2>Inico de Sesión</h2>
+        <form action="" onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email"> <strong>Email:</strong> </label>
+            <input type="email" placeholder="Ingrese Correo Electrónico" name="email" 
+            onChange={handleInput} className="form-control rounded-0"></input>
+            {errors.email && <span className="text-danger">{errors.email}</span>}
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password"><strong>Contraseña:</strong></label>
+            <input type="password" placeholder="Ingrese la Contraseña" name="password"
+            onChange={handleInput} className="form-control rounded-0"></input>
+              {errors.password && <span className="text-danger">{errors.password}</span>}
           </div>
         </main>
       </form>
