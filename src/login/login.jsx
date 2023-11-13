@@ -20,7 +20,7 @@ function Login() {
     event.preventDefault();
     setErrors(Validation(values));
     if(errors.email === "" && errors.password === ""){
-      axios.post('http://localhost:8081/login', values)
+      axios.post('http://localhost:8082/login', values)
       .then(res => {
         if(res.data === "Success"){
           navigate('/medicationTable');
