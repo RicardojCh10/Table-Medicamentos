@@ -3,8 +3,6 @@ import axios from 'axios';
 import { useContexto } from '../context/MainContext';
 import amanecer from '../assets/amanecer.png'
 
-
-
 function Morning() {
   const [medicamentos, setMedicamentos] = useState([]);
   const {handleDelete, handleTime, triggerEffect} = useContexto()

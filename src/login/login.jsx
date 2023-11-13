@@ -1,60 +1,140 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Validation from "./loginValidation";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import {RiEyeLine, RiEyeOffLine} from "react-icons/ri";
+
 function Login() {
 
-  const [values, setValues] = useState({
-    email: "",
-    password: ""
-  })
-  
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleShowPassword = () =>{
+    setShowPassword(!showPassword)
+
+  }
+
   const navigate = useNavigate();
-  const [errors, setErrors] = useState({})
 
-  const handleInput = (event) => {
-    setValues(prev => ({...prev, [event.target.name]: [event.target.value]}))
-  }
+  const [datos, setDatos] = useState({
+    email: '',
+    contrasena: '',
+    autenticado: false,
+    user: ''
+  });
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setErrors(Validation(values));
-    if(errors.email === "" && errors.password === ""){
-      axios.post('http://localhost:8082/login', values)
-      .then(res => {
-        if(res.data === "Success"){
-          navigate('/medicationTable');
-        } else{
-          alert("No existe ningún registro");
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const status = localStorage.getItem('Status');
+    const email = localStorage.getItem('email');
+    const user = localStorage.getItem('user')
+    if (status === 'true') {
+      setDatos({ ...datos, autenticado: true, email, });
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log(datos.autenticado); 
+    localStorage.setItem('email', datos.email);
+    localStorage.setItem('Status', datos.autenticado);
+    localStorage.setItem('user', datos.user)
+  }, [datos.autenticado, datos.email, datos.user]);
+
+  const handleLogin = (e) => {
+
+    e.preventDefault();
+
+        // Validation
+        if (!datos.email.trim() || !datos.contrasena.trim()) {
+          setError('Por favor, complete todos los campos.');
+          return;
         }
-  })
-      .catch(err  => console.log(err));
+
+    axios
+      .post('http://localhost:8082/login', datos)
+      .then((respuesta) => {
+        if (respuesta.status === 200) {
+          console.log(respuesta.data[0].id)
+          setDatos({ ...datos, autenticado: true, user:respuesta.data[0].id });
+          
+          console.log('Bien del front')
+        } else {
+          setError('Credenciales incorrectas, inténtalo de nuevo');
+        }
+      })
+      .catch((error) => {
+        console.error('Error al iniciar sesión: ' + error);
+        setError('Credenciales incorrectas.');
+      });
+  };
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    setDatos({ ...datos, autenticado: false });
+  };
+
+  if (datos.autenticado) {
+    navigate('/medicationTable');
+    return null;
   }
-  }
+
+
+
 
   return (
-    <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
-      <div className="bg-white p-3 rounded w-25">
-      <h2>Inico de Sesión</h2>
-        <form action="" onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="email"> <strong>Email:</strong> </label>
-            <input type="email" placeholder="Ingrese Correo Electrónico" name="email" 
-            onChange={handleInput} className="form-control rounded-0"></input>
-            {errors.email && <span className="text-danger">{errors.email}</span>}
+    !datos.autenticado ? (
+      <form onSubmit={handleLogin} style={{ backgroundImage: 'url("https://m.media-amazon.com/images/I/51F54yNB4DL._AC_SL1000_.jpg")' }}>
+        <h2 className="w-full flex-col text-center text-black  text-4xl p-5">Inicie sesion</h2>
+        <main className="h-fit flex">
+          <div className='bg-white rounded-sm p-2 w-[50%] mx-auto h-[90%] border-x-2 border-b-4 border-t flex items-center flex-wrap py-20'>
+            <div className='flex flex-wrap w-full gap-6'>
+            <div className='flex flex-col items-center justify-center w-full'>
+              <label className='text-md w-[50%] p-1.5'>email:</label>
+              <input
+                className='border-black border rounded-sm px-2 py-[.5%] w-[50%]'
+                type='email'
+                placeholder='ejemplo@gmail.com'
+                name='email'
+                value={datos.email}
+                onChange={(e) => { setDatos({ ...datos, email: e.target.value }) }}
+              />
+            </div>
+            <div className='flex flex-col items-center justify-center w-full'>
+              <label className='text-md w-[50%] p-1.5'>Contraseña:</label>
+              <input
+                className='border-black border rounded-sm px-2 py-[.5%] w-[50%]'
+                type= {showPassword ? "text" : "password"}
+                placeholder='****'
+                name='contrasena'
+                value={datos.contrasena}
+                onChange={(e) => { setDatos({ ...datos, contrasena: e.target.value }) }}
+              />
+              {showPassword ? (
+                <RiEyeOffLine onClick={handleShowPassword} className='absolute mr-[-21.5%] mt-[4%] -translate-y-1/2 hover:cursor-pointer'/>
+
+              ) : (
+                <RiEyeLine onClick={handleShowPassword} className='absolute mr-[-21.5%] mt-[4%] -translate-y-1/2 hover:cursor-pointer'/>
+              )}
+              
+            </div>
+            <div className='text-center justify-center w-full'>
+              <button type='submit' className='bg-black rounded-sm  w-[40%] py-2 transition-all duration-300 ease-in-out hover:bg-sky-700  text-white'>Inicie sesion</button>
+            </div>
+            
+            <div className='text-center justify-center w-full flex flex-wrap '>
+            <div className='w-full '>{error && <span className="text-red-500">{error}</span>}</div>
+              
+            </div>
+            <div className=' flex justify-center w-full'><h3>¿No has creado una cuenta? </h3>
+              <Link to="/registro">
+                <span className='text-sky-700 mx-2 '>Registrese</span>
+              </Link></div>
+            </div>
           </div>
-          <div className="mb-3">
-            <label htmlFor="password"><strong>Contraseña:</strong></label>
-            <input type="password" placeholder="Ingrese la Contraseña" name="password"
-            onChange={handleInput} className="form-control rounded-0"></input>
-              {errors.password && <span className="text-danger">{errors.password}</span>}
-          </div>
-          <button  type='submit' className="btn btn-success w-100 rounded-0">Iniciar Sesión</button>
-          <p>Estas de acuerdo con las politicas y privacidad</p>
-          <Link to ='/signup' className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">Registrarse</Link>
-        </form>
-      </div>
-    </div>
+        </main>
+      </form>
+    ) : (
+      navigate('/')
+    )
   );
 }
 

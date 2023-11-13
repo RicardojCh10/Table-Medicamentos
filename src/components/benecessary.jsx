@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useContexto } from "../context/MainContext";
-import necesario from "../assets/pastillas.png";
+import pastillas from "../assets/pastillas.png";
 
 function BeNecessary() {
   const [medicamentos, setMedicamentos] = useState([]);
@@ -31,7 +31,7 @@ function BeNecessary() {
       {/*Nombre*/}
       <th className="bg-[#03bb85] w-40 h-fit border-r-2  font-semibold">
         Solo cuando sea necesario
-        <img className="w-8 h-8 mb-auto mx-auto" src={necesario}></img>
+        <img className="w-8 h-8 mb-auto mx-auto" src={pastillas}></img>
       </th>
       <td className="bg-[#68ddbd]  w-40 h-fit  border-r-2 ">
         {medicamentos ? (

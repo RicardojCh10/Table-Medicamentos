@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useContexto } from "../context/MainContext";
-import mediodia from "../assets/sol.png";
+import amanecer from "../assets/amanecer.png";
 
 function Noon() {
   const [medicamentos, setMedicamentos] = useState([]);
@@ -39,7 +39,7 @@ function Noon() {
         Mediodia
         <img
           className="items-center justify-center mx-auto mb-auto w-10 h-10 "
-          src={mediodia}
+          src={amanecer}
         ></img>
       </th>
       <td className="bg-[#FFFF71]  w-40 h-fit border-r-2">
