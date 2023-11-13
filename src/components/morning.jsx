@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useContexto } from '../context/MainContext';
-import amanecer from '../assets/amanecer.png'
+import manana from '../assets/manana.png'
 
 function Morning() {
   const [medicamentos, setMedicamentos] = useState([]);
@@ -40,7 +40,7 @@ function Morning() {
     <>
       {/*Nombre*/}
       <th className='bg-[#FF9688] w-40 h-fit border-r-2 font-semibold'>Mañana
-        <img className='w-10 h-10 mb-auto mx-auto' src={amanecer}/>
+        <img className='w-10 h-10 mb-auto mx-auto' src={manana}/>
       </th>
       <td className='bg-[#FF9688] w-40 h-fit border-r-2 '>
         {medicamentos ? (

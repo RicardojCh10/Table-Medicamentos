@@ -12,7 +12,6 @@ import Tabla from './pages/MedicationTable';
 import './index.css';
 import {ContextoContextProvider} from './context/MainContext'
 
-
 const router = createBrowserRouter([
   {
     path:"/",
